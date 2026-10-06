@@ -1,0 +1,869 @@
+/* =========================================
+   PEACH + CREAM THEME
+========================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    background: #FFF8F2;
+
+    color: #594C45;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    min-height: 100vh;
+}
+
+
+/* =========================================
+   OPENING SCREEN
+========================================= */
+
+.opening-screen {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 25px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #FFF8F2,
+            #FBE5D8,
+            #FFF8F2
+        );
+
+    transition:
+        opacity 1s ease,
+        visibility 1s ease;
+}
+
+
+.opening-screen.hide {
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+}
+
+
+.opening-card {
+
+    width: 100%;
+
+    max-width: 450px;
+
+    padding: 55px 30px;
+
+    text-align: center;
+
+    background: rgba(
+        255,
+        255,
+        255,
+        0.8
+    );
+
+    border:
+        1px solid
+        rgba(
+            232,
+            180,
+            157,
+            0.4
+        );
+
+    border-radius: 28px;
+
+    box-shadow:
+        0 25px 70px
+        rgba(
+            137,
+            89,
+            68,
+            0.12
+        );
+
+    backdrop-filter: blur(10px);
+}
+
+
+.opening-heart {
+
+    font-size: 48px;
+
+    color: #E8B49D;
+
+    margin-bottom: 18px;
+
+    animation:
+        heartFloat 2.5s ease-in-out infinite;
+}
+
+
+.opening-card h1 {
+
+    font-size: 36px;
+
+    font-weight: normal;
+
+    color: #594C45;
+
+    margin-bottom: 20px;
+}
+
+
+.opening-card p {
+
+    font-size: 16px;
+
+    line-height: 1.8;
+
+    color: #806F67;
+
+    margin-bottom: 20px;
+}
+
+
+.earphone-text {
+
+    display: block;
+
+    color: #A99186;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 12px;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 28px;
+}
+
+
+/* =========================================
+   OPEN BUTTON
+========================================= */
+
+#openButton {
+
+    border: none;
+
+    background: #E8B49D;
+
+    color: white;
+
+    padding:
+        13px
+        35px;
+
+    border-radius: 30px;
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px
+        rgba(
+            201,
+            130,
+            104,
+            0.22
+        );
+
+    transition:
+        transform 0.3s ease,
+        background 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+#openButton:hover {
+
+    background: #D9957B;
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 12px 25px
+        rgba(
+            201,
+            130,
+            104,
+            0.3
+        );
+}
+
+
+/* =========================================
+   MAIN PAGE
+========================================= */
+
+.main-content {
+
+    display: none;
+
+    width: 100%;
+
+    max-width: 720px;
+
+    margin: 0 auto;
+
+    padding:
+        65px 22px
+        50px;
+}
+
+
+.main-content.show {
+
+    display: block;
+
+    animation:
+        pageAppear 1.1s ease;
+}
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+.top-decoration {
+
+    text-align: center;
+
+    color: #E8B49D;
+
+    font-size: 30px;
+
+    margin-bottom: 12px;
+
+    animation:
+        heartFloat 3s ease-in-out infinite;
+}
+
+
+.main-content > h1 {
+
+    text-align: center;
+
+    font-size: 40px;
+
+    font-weight: normal;
+
+    color: #594C45;
+
+    margin-bottom: 18px;
+}
+
+
+.intro {
+
+    max-width: 570px;
+
+    margin:
+        0 auto
+        35px;
+
+    text-align: center;
+
+    color: #806F67;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    line-height: 1.8;
+}
+
+
+/* =========================================
+   PHOTO
+========================================= */
+
+.photo-section {
+
+    display: flex;
+
+    justify-content: center;
+
+    margin-bottom: 45px;
+}
+
+
+.photo-frame {
+
+    padding: 10px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 18px 50px
+        rgba(
+            137,
+            89,
+            68,
+            0.13
+        );
+
+    transform:
+        rotate(-1deg);
+
+    transition:
+        transform 0.4s ease;
+}
+
+
+.photo-frame:hover {
+
+    transform:
+        rotate(0deg)
+        scale(1.01);
+}
+
+
+.photo {
+
+    display: block;
+
+    width: 100%;
+
+    max-width: 450px;
+
+    max-height: 600px;
+
+    object-fit: cover;
+
+    border-radius: 14px;
+}
+
+
+/* =========================================
+   VIDEO + AUDIO
+========================================= */
+
+.media-section {
+
+    text-align: center;
+
+    margin:
+        35px auto
+        50px;
+
+    padding:
+        30px 20px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.72
+        );
+
+    border:
+        1px solid
+        #F1D4C7;
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 12px 35px
+        rgba(
+            137,
+            89,
+            68,
+            0.07
+        );
+}
+
+
+.section-icon {
+
+    font-size: 25px;
+
+    margin-bottom: 10px;
+}
+
+
+.media-section h2 {
+
+    font-size: 21px;
+
+    font-weight: normal;
+
+    color: #654F46;
+
+    margin-bottom: 8px;
+}
+
+
+.media-section > p {
+
+    color: #9A8177;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    margin-bottom: 22px;
+}
+
+
+.video-player {
+
+    display: block;
+
+    width: 100%;
+
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    background: #2C2421;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 12px 30px
+        rgba(
+            80,
+            50,
+            40,
+            0.16
+        );
+}
+
+
+.voice-section {
+
+    margin-top: 25px;
+}
+
+
+audio {
+
+    width: 100%;
+
+    max-width: 500px;
+}
+
+
+/* =========================================
+   DIVIDER
+========================================= */
+
+.divider {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin:
+        15px auto
+        45px;
+
+    color: #E0A58D;
+}
+
+
+.divider::before,
+.divider::after {
+
+    content: "";
+
+    height: 1px;
+
+    width: 100px;
+
+    background:
+        #EBCFC2;
+}
+
+
+/* =========================================
+   LETTER CARD
+========================================= */
+
+.letter-card {
+
+    background: #FFFFFF;
+
+    border-radius: 25px;
+
+    padding:
+        42px 35px;
+
+    box-shadow:
+        0 18px 55px
+        rgba(
+            137,
+            89,
+            68,
+            0.1
+        );
+
+    border:
+        1px solid
+        #F1DAD0;
+}
+
+
+.letter-top {
+
+    text-align: center;
+
+    font-size: 27px;
+
+    margin-bottom: 8px;
+}
+
+
+.letter-card > h2 {
+
+    text-align: center;
+
+    font-size: 25px;
+
+    font-weight: normal;
+
+    color: #654F46;
+
+    margin-bottom: 38px;
+}
+
+
+/* =========================================
+   LETTER CONTENT
+========================================= */
+
+.letter-content {
+
+    color: #594C45;
+}
+
+
+.letter-content p {
+
+    font-size: 16px;
+
+    line-height: 2;
+
+    margin-bottom: 25px;
+}
+
+
+.letter-content .greeting {
+
+    font-size: 21px;
+
+    color: #4F403A;
+
+    margin-bottom: 30px;
+}
+
+
+.letter-content em {
+
+    color: #C98268;
+
+    font-style: italic;
+}
+
+
+/* =========================================
+   SIGNATURE
+========================================= */
+
+.signature {
+
+    margin-top: 50px;
+
+    padding-top: 28px;
+
+    border-top:
+        1px solid
+        #F0DDD5;
+
+    text-align: right;
+}
+
+
+.signature p {
+
+    color: #927B71;
+
+    font-size: 15px;
+
+    margin-bottom: 7px;
+}
+
+
+.signature strong {
+
+    display: block;
+
+    color: #765B50;
+
+    font-style: italic;
+
+    font-size: 16px;
+
+    font-weight: normal;
+
+    margin-bottom: 7px;
+}
+
+
+.signature span {
+
+    display: block;
+
+    color: #594C45;
+
+    font-size: 19px;
+}
+
+
+.signature-heart {
+
+    color: #E2A58D;
+
+    font-size: 25px;
+
+    margin-top: 10px;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer {
+
+    text-align: center;
+
+    margin-top: 65px;
+
+    padding-top: 30px;
+
+    border-top:
+        1px solid
+        #EBD7CD;
+
+    color: #9A8177;
+}
+
+
+.footer-heart {
+
+    color: #E2A58D;
+
+    font-size: 25px;
+
+    margin-bottom: 8px;
+}
+
+
+footer p {
+
+    font-size: 14px;
+
+    margin-bottom: 8px;
+}
+
+
+footer small {
+
+    color: #B59F95;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes heartFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-6px);
+    }
+}
+
+
+@keyframes pageAppear {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(25px);
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .main-content {
+
+        padding:
+            50px 16px
+            40px;
+    }
+
+
+    .main-content > h1 {
+
+        font-size: 31px;
+    }
+
+
+    .intro {
+
+        font-size: 13px;
+
+        padding:
+            0 5px;
+    }
+
+
+    .photo-frame {
+
+        padding: 7px;
+
+        border-radius: 16px;
+    }
+
+
+    .photo {
+
+        border-radius: 11px;
+    }
+
+
+    .media-section {
+
+        padding:
+            25px 15px;
+    }
+
+
+    .letter-card {
+
+        padding:
+            32px 23px;
+
+        border-radius: 20px;
+    }
+
+
+    .letter-card > h2 {
+
+        font-size: 22px;
+
+        margin-bottom: 30px;
+    }
+
+
+    .letter-content p {
+
+        font-size: 15.5px;
+
+        line-height: 1.9;
+
+        margin-bottom: 23px;
+    }
+
+
+    .letter-content .greeting {
+
+        font-size: 19px;
+    }
+
+
+    .signature {
+
+        margin-top: 40px;
+    }
+
+
+    .opening-card {
+
+        padding:
+            45px 25px;
+    }
+
+
+    .opening-card h1 {
+
+        font-size: 31px;
+    }
+
+}
