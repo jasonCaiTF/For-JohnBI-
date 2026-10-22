@@ -1,23 +1,32 @@
 
 "use strict";
 
-// ========================================
+// =====================================
 // FOR MY JOHNBI ❤️
-// Video + 7 Voice Recordings + Background Music
-// ========================================
+// Video + 7 Recordings + Background Music
+// =====================================
 
-// ELEMENTS
-const openingScreen = document.getElementById("openingScreen");
-const openButton = document.getElementById("openButton");
+const openingScreen =
+  document.getElementById("openingScreen");
 
-const video = document.getElementById("johnbiVideo");
-const voice = document.getElementById("voiceAudio");
-const music = document.getElementById("backgroundMusic");
-const audioStatus = document.getElementById("audioStatus");
+const video =
+  document.getElementById("johnbiVideo");
 
-// ========================================
-// VOICE RECORDINGS
-// ========================================
+const voice =
+  document.getElementById("voiceAudio");
+
+const music =
+  document.getElementById("backgroundMusic");
+
+const startButton =
+  document.getElementById("startButton");
+
+const audioStatus =
+  document.getElementById("audioStatus");
+
+// =====================================
+// SEVEN RECORDINGS
+// =====================================
 
 const voiceFiles = [
   "给johnbi1.m4a",
@@ -30,37 +39,34 @@ const voiceFiles = [
 ];
 
 let currentVoiceIndex = 0;
-let allVoicesFinished = false;
+let sequenceFinished = false;
 let sequenceStarted = false;
+let audioUnlocked = false;
 
-// ========================================
-// SETTINGS
-// ========================================
+// Prevent old play requests from
+// interfering with a newer playback.
+let playGeneration = 0;
 
-// Video repeats every 26 seconds.
+// =====================================
+// AUDIO SETTINGS
+// =====================================
+
+// Repeat the 26-second video.
 video.loop = true;
 
-// Mute original video sound.
+// Avoid overlapping original video sound.
 video.muted = true;
 
-// Voice at full volume.
+// Recording volume.
 voice.volume = 1.0;
 
-// Soft background music.
+// Background music: 7%.
 music.volume = 0.07;
 music.loop = true;
 
-// ========================================
-// OPENING SCREEN
-// ========================================
-
-openButton.addEventListener("click", () => {
-  openingScreen.classList.add("hidden");
-});
-
-// ========================================
-// STATUS
-// ========================================
+// =====================================
+// STATUS MESSAGE
+// =====================================
 
 function showStatus(message) {
   if (audioStatus) {
@@ -72,9 +78,20 @@ function clearStatus() {
   showStatus("");
 }
 
-// ========================================
-// LOAD RECORDING
-// ========================================
+// =====================================
+// OPENING SCREEN
+// =====================================
+
+const openButton =
+  document.getElementById("openButton");
+
+openButton.addEventListener("click", () => {
+  openingScreen.classList.add("hidden");
+});
+
+// =====================================
+// LOAD VOICE
+// =====================================
 
 function loadVoice(index) {
   if (index < 0 || index >= voiceFiles.length) {
@@ -89,154 +106,279 @@ function loadVoice(index) {
   return true;
 }
 
-// Prepare first recording.
+// Load first recording.
 loadVoice(0);
 
-// ========================================
-// PLAY AUDIO
-// ========================================
+// =====================================
+// HANDLE PLAYBACK ERRORS
+// =====================================
 
-function playVoice() {
-  if (allVoicesFinished) return;
+function handlePlayError(error, name, generation) {
+  if (generation !== playGeneration) {
+    return;
+  }
 
-  voice.play().catch((error) => {
-    console.error("Voice playback error:", error);
+  if (error.name === "AbortError") {
+    return;
+  }
 
-    if (!video.paused) {
-      showStatus(
-        "Voice recording could not start. Please check the audio file."
-      );
-    }
-  });
+  console.error(name + " playback error:", error);
+
+  showStatus(
+    name + " could not start. " +
+    "Please check the file or tap " +
+    "Start our memories ♡ again."
+  );
 }
 
-function playMusic() {
-  music.play().catch((error) => {
-    console.error("Music playback error:", error);
+// =====================================
+// START AUDIO
+// =====================================
 
-    if (!video.paused) {
-      showStatus(
-        "Background music could not start."
-      );
+function startAudio() {
+  if (sequenceFinished) {
+    return;
+  }
+
+  const generation = ++playGeneration;
+
+  // Call both play() methods immediately.
+  // This helps mobile browser compatibility.
+
+  if (!voice.ended) {
+    const voicePromise = voice.play();
+
+    if (voicePromise) {
+      voicePromise.catch(error => {
+        handlePlayError(
+          error,
+          "Voice recording",
+          generation
+        );
+      });
     }
-  });
+  }
+
+  const musicPromise = music.play();
+
+  if (musicPromise) {
+    musicPromise.catch(error => {
+      handlePlayError(
+        error,
+        "Background music",
+        generation
+      );
+    });
+  }
 }
 
-// ========================================
-// START / RESUME
-// ========================================
+// =====================================
+// START BUTTON
+// =====================================
 
-video.addEventListener("play", () => {
-
+startButton.addEventListener("click", () => {
   clearStatus();
 
-  // Restart sequence after all recordings
-  // have finished.
-  if (allVoicesFinished) {
-    allVoicesFinished = false;
-    sequenceStarted = false;
-    loadVoice(0);
-    music.currentTime = 0;
+  // Restart everything if all
+  // seven recordings have finished.
+  if (sequenceFinished) {
+    resetSequence();
+  }
+
+  // This click is a direct user gesture.
+  // Start all media without waiting for
+  // another asynchronous operation.
+
+  audioUnlocked = true;
+  sequenceStarted = true;
+
+  startAudio();
+
+  const videoPromise = video.play();
+
+  if (videoPromise) {
+    videoPromise.catch(error => {
+      console.error("Video error:", error);
+
+      voice.pause();
+      music.pause();
+
+      showStatus(
+        "Video could not start. " +
+        "Please check johnbi-video.mp4."
+      );
+    });
+  }
+});
+
+// =====================================
+// NATIVE VIDEO PLAY BUTTON
+// =====================================
+
+video.addEventListener("play", () => {
+  clearStatus();
+
+  if (sequenceFinished) {
+    resetSequence();
   }
 
   if (!sequenceStarted) {
     sequenceStarted = true;
   }
 
-  playVoice();
-  playMusic();
+  // If audio was already started by
+  // the custom button, don't duplicate it.
+  if (!audioUnlocked) {
+    audioUnlocked = true;
+  }
 
+  if (voice.paused || music.paused) {
+    startAudio();
+  }
 });
 
-// ========================================
-// PAUSE
-// ========================================
+// =====================================
+// PAUSE EVERYTHING
+// =====================================
 
 video.addEventListener("pause", () => {
   voice.pause();
   music.pause();
 });
 
-// ========================================
-// NEXT RECORDING
-// ========================================
+// =====================================
+// PLAY NEXT RECORDING
+// =====================================
 
 voice.addEventListener("ended", () => {
 
-  // All seven recordings have finished.
-  if (currentVoiceIndex === voiceFiles.length - 1) {
-
-    allVoicesFinished = true;
-
-    voice.pause();
-    music.pause();
-    video.pause();
-
-    showStatus(
-      "Seven little messages, just for you. ❤️"
-    );
-
+  // Last recording has finished.
+  if (
+    currentVoiceIndex ===
+    voiceFiles.length - 1
+  ) {
+    finishSequence();
     return;
   }
 
-  // Move to next recording.
+  // Next recording.
   const nextIndex = currentVoiceIndex + 1;
 
   loadVoice(nextIndex);
 
-  // Continue only while video is playing.
-  if (!video.paused) {
-    playVoice();
-  }
+  // Continue automatically if
+  // video is still playing.
+  if (!video.paused && !sequenceFinished) {
 
+    const generation = ++playGeneration;
+
+    voice.play().catch(error => {
+      handlePlayError(
+        error,
+        "Voice recording " + (nextIndex + 1),
+        generation
+      );
+    });
+  }
 });
 
-// ========================================
+// =====================================
+// FINISH ALL SEVEN RECORDINGS
+// =====================================
+
+function finishSequence() {
+  sequenceFinished = true;
+
+  voice.pause();
+  music.pause();
+  video.pause();
+
+  showStatus(
+    "Seven little messages, just for you. ❤️"
+  );
+
+  // Update button for replay.
+  startButton.textContent =
+    "Listen again ♡";
+}
+
+// =====================================
+// RESET FOR REPLAY
+// =====================================
+
+function resetSequence() {
+  playGeneration++;
+
+  voice.pause();
+  music.pause();
+  video.pause();
+
+  sequenceFinished = false;
+  sequenceStarted = false;
+
+  video.currentTime = 0;
+  music.currentTime = 0;
+
+  loadVoice(0);
+
+  startButton.textContent =
+    "Start our memories ♡";
+
+  clearStatus();
+}
+
+// =====================================
 // VIDEO ERROR
-// ========================================
+// =====================================
 
 video.addEventListener("error", () => {
   showStatus(
-    "Video could not load. Please check johnbi-video.mp4."
+    "Video could not load. " +
+    "Check johnbi-video.mp4."
   );
 });
 
-// ========================================
+// =====================================
 // VOICE ERROR
-// ========================================
+// =====================================
 
 voice.addEventListener("error", () => {
+  if (!voice.src) return;
+
   showStatus(
-    "Voice file could not load: " +
+    "Cannot load recording: " +
     voiceFiles[currentVoiceIndex]
   );
 });
 
-// ========================================
+// =====================================
 // MUSIC ERROR
-// ========================================
+// =====================================
 
 music.addEventListener("error", () => {
   showStatus(
-    "Background music could not load."
+    "Cannot load background-music.mp3."
   );
 });
 
-// ========================================
+// =====================================
 // PAGE VISIBILITY
-// ========================================
+// =====================================
 
-// Pause everything when user switches apps
-// or locks their phone.
+// Pause when the phone is locked
+// or the browser is moved to background.
 
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden && !video.paused) {
-    video.pause();
+document.addEventListener(
+  "visibilitychange",
+  () => {
+    if (document.hidden && !video.paused) {
+      video.pause();
+    }
   }
-});
+);
 
-// ========================================
+// =====================================
 // READY
-// ========================================
+// =====================================
 
 console.log("For My Johnbi ❤️ Ready");
