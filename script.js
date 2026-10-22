@@ -1,18 +1,25 @@
 
 "use strict";
 
-// ===============================
-// ELEMENTS
-// ===============================
+// ========================================
+// FOR MY JOHNBI - AUDIO & VIDEO CONTROLLER
+// ========================================
+
+// HTML Elements
+const openingScreen = document.getElementById("openingScreen");
+const openButton = document.getElementById("openButton");
 
 const video = document.getElementById("johnbiVideo");
 const voice = document.getElementById("voiceAudio");
 const music = document.getElementById("backgroundMusic");
-const statusText = document.getElementById("audioStatus");
+const audioStatus = document.getElementById("audioStatus");
 
-// ===============================
+// ========================================
 // SEVEN VOICE RECORDINGS
-// ===============================
+// ========================================
+
+// IMPORTANT:
+// File names must match GitHub exactly.
 
 const voiceFiles = [
   "给johnbi1.m4a",
@@ -25,170 +32,216 @@ const voiceFiles = [
 ];
 
 let currentVoiceIndex = 0;
-let finished = false;
-let session = 0;
+let allVoicesFinished = false;
+let switchingVoice = false;
 
-// ===============================
-// AUDIO SETTINGS
-// ===============================
+// ========================================
+// BASIC SETTINGS
+// ========================================
 
-// Clear voice
 voice.volume = 1.0;
-
-// Very soft background music
 music.volume = 0.07;
+music.loop = true;
 
-// Video has no separate sound.
-// Remove this line if you want its original audio.
+// Prevent the video's original sound
+// from interfering with the recordings.
 video.muted = true;
 
-// ===============================
-// HELPERS
-// ===============================
+// ========================================
+// OPENING SCREEN
+// ========================================
 
-function updateStatus(message) {
-  if (statusText) {
-    statusText.textContent = message;
+openButton.addEventListener("click", () => {
+  openingScreen.classList.add("hidden");
+});
+
+// ========================================
+// STATUS MESSAGE
+// ========================================
+
+function showStatus(message) {
+  if (audioStatus) {
+    audioStatus.textContent = message;
   }
 }
+
+function clearStatus() {
+  showStatus("");
+}
+
+// ========================================
+// LOAD A VOICE RECORDING
+// ========================================
 
 function loadVoice(index) {
   if (index < 0 || index >= voiceFiles.length) {
-    return;
+    return false;
   }
 
   currentVoiceIndex = index;
-  voice.src = voiceFiles[index];
+
+  voice.src = "./" + voiceFiles[index];
   voice.load();
 
-  updateStatus(
-    `Voice message ${index + 1} of ${voiceFiles.length} ♡`
-  );
+  return true;
 }
 
-function tryPlay(element, label) {
-  const result = element.play();
+// Prepare the first recording.
+loadVoice(0);
 
-  if (result && typeof result.catch === "function") {
-    result.catch(error => {
-      console.warn(label + " playback error:", error);
+// ========================================
+// PLAY AUDIO
+// ========================================
 
-      if (!video.paused) {
-        updateStatus(
-          "Audio could not start. Please tap pause and play again."
+function playVoice() {
+  if (allVoicesFinished || switchingVoice) {
+    return;
+  }
+
+  const promise = voice.play();
+
+  if (promise !== undefined) {
+    promise.catch((error) => {
+      if (!video.paused && !video.ended) {
+        console.error("Voice playback error:", error);
+
+        showStatus(
+          "Voice recording could not start. Please check the audio file."
         );
       }
     });
   }
 }
 
-// ===============================
-// INITIALIZE
-// ===============================
+function playMusic() {
+  const promise = music.play();
 
-loadVoice(0);
+  if (promise !== undefined) {
+    promise.catch((error) => {
+      if (!video.paused && !video.ended) {
+        console.error("Music playback error:", error);
 
-updateStatus("Seven little messages, just for you.");
+        showStatus(
+          "Background music could not start."
+        );
+      }
+    });
+  }
+}
 
-// ===============================
-// VIDEO PLAY
-// ===============================
+// ========================================
+// VIDEO STARTS
+// ========================================
 
 video.addEventListener("play", () => {
+  clearStatus();
 
-  if (finished) {
-    finished = false;
-    session++;
+  // Restart the voice sequence after
+  // the video has finished previously.
+  if (allVoicesFinished && video.currentTime === 0) {
+    allVoicesFinished = false;
     loadVoice(0);
-    music.currentTime = 0;
   }
 
-  // Start both tracks immediately from
-  // the user's video-play interaction.
-  tryPlay(voice, "Voice");
-  tryPlay(music, "Music");
-
+  playVoice();
+  playMusic();
 });
 
-// ===============================
-// VIDEO PAUSE
-// ===============================
+// ========================================
+// VIDEO PAUSES
+// ========================================
 
 video.addEventListener("pause", () => {
   voice.pause();
   music.pause();
 });
 
-// ===============================
+// ========================================
 // NEXT VOICE RECORDING
-// ===============================
+// ========================================
 
 voice.addEventListener("ended", () => {
+  if (currentVoiceIndex >= voiceFiles.length - 1) {
+    allVoicesFinished = true;
+    return;
+  }
 
-  if (finished) return;
+  switchingVoice = true;
 
   const nextIndex = currentVoiceIndex + 1;
 
-  if (nextIndex < voiceFiles.length) {
+  loadVoice(nextIndex);
 
-    loadVoice(nextIndex);
+  switchingVoice = false;
 
-    if (!video.paused) {
-      tryPlay(voice, "Next voice");
-    }
-
-  } else {
-
-    // All seven recordings have finished.
-    finished = true;
-    session++;
-
-    voice.pause();
-    music.pause();
-    video.pause();
-
-    updateStatus(
-      "All seven messages have finished. ♡"
-    );
-
+  // Continue only while video is playing.
+  if (!video.paused && !video.ended) {
+    playVoice();
   }
-
 });
 
-// ===============================
-// VIDEO LOOPING
-// ===============================
+// ========================================
+// VIDEO ENDS
+// ========================================
 
-// The HTML video has the loop attribute.
-// If the video is shorter than all seven
-// recordings, it repeats without interrupting
-// the voice or background music.
+video.addEventListener("ended", () => {
+  voice.pause();
+  music.pause();
 
-// ===============================
+  // Reset audio for the next viewing.
+  allVoicesFinished = false;
+  currentVoiceIndex = 0;
+
+  music.currentTime = 0;
+  loadVoice(0);
+
+  clearStatus();
+});
+
+// ========================================
+// VIDEO ERRORS
+// ========================================
+
+video.addEventListener("error", () => {
+  showStatus(
+    "Video could not load. Please check johnbi-video.mp4."
+  );
+});
+
+// ========================================
 // AUDIO ERRORS
-// ===============================
+// ========================================
 
 voice.addEventListener("error", () => {
-  updateStatus(
-    "A recording could not load. Please check its filename."
-  );
+  if (voice.src) {
+    showStatus(
+      "Voice file could not load: " +
+      voiceFiles[currentVoiceIndex]
+    );
+  }
 });
 
 music.addEventListener("error", () => {
-  console.warn(
-    "Background music could not load. Check background-music.mp3"
+  showStatus(
+    "Background music file could not load."
   );
 });
 
-// ===============================
+// ========================================
 // PAGE VISIBILITY
-// ===============================
+// ========================================
 
-// Pause everything if the visitor
-// switches apps or locks the phone.
+// Pause video when user switches apps
+// or locks the phone.
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden && !video.paused) {
     video.pause();
   }
 });
+
+// ========================================
+// INITIALIZATION COMPLETE
+// ========================================
+
+console.log("For My Johnbi - Ready ♡");
