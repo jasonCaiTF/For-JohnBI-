@@ -61,7 +61,8 @@ video.muted = true;
 voice.volume = 1.0;
 
 // Background music: 7%.
-music.volume = 0.07;
+music.volume = 0.02;
+voice.volume = 1.0;
 music.loop = true;
 
 // =====================================
