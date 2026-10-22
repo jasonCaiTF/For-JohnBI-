@@ -1,199 +1,194 @@
-const openingScreen = document.getElementById("openingScreen");
-const openButton = document.getElementById("openButton");
 
-const video = document.getElementById("myVideo");
+"use strict";
+
+// ===============================
+// ELEMENTS
+// ===============================
+
+const video = document.getElementById("johnbiVideo");
 const voice = document.getElementById("voiceAudio");
 const music = document.getElementById("backgroundMusic");
+const statusText = document.getElementById("audioStatus");
 
-
-// =========================
-// Voice Recordings
-// =========================
+// ===============================
+// SEVEN VOICE RECORDINGS
+// ===============================
 
 const voiceFiles = [
-    "给johnbi1.m4a",
-    "给johnbi2.m4a",
-    "给johnbi3.m4a",
-    "给johnbi4.m4a",
-    "给johnbi5.m4a",
-    "给johnbi6.m4a",
-    "给johnbi7.m4a"
+  "给johnbi1.m4a",
+  "给johnbi2.m4a",
+  "给johnbi3.m4a",
+  "给johnbi4.m4a",
+  "给johnbi5.m4a",
+  "给johnbi6.m4a",
+  "给johnbi7.m4a"
 ];
 
 let currentVoiceIndex = 0;
+let finished = false;
+let session = 0;
 
+// ===============================
+// AUDIO SETTINGS
+// ===============================
 
-// =========================
-// Audio Settings
-// =========================
-
+// Clear voice
 voice.volume = 1.0;
 
-// Background music is intentionally very quiet.
+// Very soft background music
 music.volume = 0.07;
 
+// Video has no separate sound.
+// Remove this line if you want its original audio.
+video.muted = true;
 
-// =========================
-// Opening Screen
-// =========================
+// ===============================
+// HELPERS
+// ===============================
 
-openButton.addEventListener("click", () => {
-
-    openingScreen.classList.add("hidden");
-
-});
-
-
-// =========================
-// Load Voice
-// =========================
+function updateStatus(message) {
+  if (statusText) {
+    statusText.textContent = message;
+  }
+}
 
 function loadVoice(index) {
+  if (index < 0 || index >= voiceFiles.length) {
+    return;
+  }
 
-    if (index < 0 || index >= voiceFiles.length) {
-        return;
-    }
+  currentVoiceIndex = index;
+  voice.src = voiceFiles[index];
+  voice.load();
 
-    currentVoiceIndex = index;
-
-    voice.src = voiceFiles[index];
-
-    voice.load();
-
+  updateStatus(
+    `Voice message ${index + 1} of ${voiceFiles.length} ♡`
+  );
 }
 
+function tryPlay(element, label) {
+  const result = element.play();
 
-// Load first recording
+  if (result && typeof result.catch === "function") {
+    result.catch(error => {
+      console.warn(label + " playback error:", error);
+
+      if (!video.paused) {
+        updateStatus(
+          "Audio could not start. Please tap pause and play again."
+        );
+      }
+    });
+  }
+}
+
+// ===============================
+// INITIALIZE
+// ===============================
+
 loadVoice(0);
 
+updateStatus("Seven little messages, just for you.");
 
-// =========================
-// Play All Audio
-// =========================
-
-async function startAudio() {
-
-    try {
-        await voice.play();
-    } catch (error) {
-        console.log("Voice playback blocked:", error);
-    }
-
-    try {
-        await music.play();
-    } catch (error) {
-        console.log("Background music playback blocked:", error);
-    }
-
-}
-
-
-// =========================
-// Video Starts
-// =========================
+// ===============================
+// VIDEO PLAY
+// ===============================
 
 video.addEventListener("play", () => {
 
-    startAudio();
+  if (finished) {
+    finished = false;
+    session++;
+    loadVoice(0);
+    music.currentTime = 0;
+  }
+
+  // Start both tracks immediately from
+  // the user's video-play interaction.
+  tryPlay(voice, "Voice");
+  tryPlay(music, "Music");
 
 });
 
-
-// =========================
-// Video Pauses
-// =========================
+// ===============================
+// VIDEO PAUSE
+// ===============================
 
 video.addEventListener("pause", () => {
-
-    voice.pause();
-    music.pause();
-
+  voice.pause();
+  music.pause();
 });
 
-
-// =========================
-// Next Voice Recording
-// =========================
+// ===============================
+// NEXT VOICE RECORDING
+// ===============================
 
 voice.addEventListener("ended", () => {
 
-    currentVoiceIndex++;
+  if (finished) return;
 
-    if (currentVoiceIndex < voiceFiles.length) {
+  const nextIndex = currentVoiceIndex + 1;
 
-        loadVoice(currentVoiceIndex);
+  if (nextIndex < voiceFiles.length) {
 
-        // Continue automatically if video is still playing.
-        if (!video.paused && !video.ended) {
-            voice.play().catch(error => {
-                console.log("Next voice playback blocked:", error);
-            });
-        }
+    loadVoice(nextIndex);
 
+    if (!video.paused) {
+      tryPlay(voice, "Next voice");
     }
 
-});
+  } else {
 
-
-// =========================
-// Video Ends
-// =========================
-
-video.addEventListener("ended", () => {
+    // All seven recordings have finished.
+    finished = true;
+    session++;
 
     voice.pause();
     music.pause();
+    video.pause();
 
-    voice.currentTime = 0;
-    music.currentTime = 0;
+    updateStatus(
+      "All seven messages have finished. ♡"
+    );
 
-    currentVoiceIndex = 0;
-
-    loadVoice(0);
-
-});
-
-
-// =========================
-// Keep Voice & Music In Sync
-// =========================
-
-let lastSyncTime = 0;
-
-video.addEventListener("timeupdate", () => {
-
-    const now = Date.now();
-
-    // Only check every 500ms.
-    if (now - lastSyncTime < 500) {
-        return;
-    }
-
-    lastSyncTime = now;
-
-
-    /*
-       Background music follows the video.
-       Voice recordings are separate files, so their
-       timing is controlled by the recording sequence.
-    */
+  }
 
 });
 
+// ===============================
+// VIDEO LOOPING
+// ===============================
 
-// =========================
-// If User Seeks
-// =========================
+// The HTML video has the loop attribute.
+// If the video is shorter than all seven
+// recordings, it repeats without interrupting
+// the voice or background music.
 
-video.addEventListener("seeking", () => {
+// ===============================
+// AUDIO ERRORS
+// ===============================
 
-    /*
-       Since there are seven separate voice recordings,
-       we don't force the voice position to the video's
-       exact timestamp.
+voice.addEventListener("error", () => {
+  updateStatus(
+    "A recording could not load. Please check its filename."
+  );
+});
 
-       This prevents accidentally jumping to the wrong
-       recording.
-    */
+music.addEventListener("error", () => {
+  console.warn(
+    "Background music could not load. Check background-music.mp3"
+  );
+});
 
+// ===============================
+// PAGE VISIBILITY
+// ===============================
+
+// Pause everything if the visitor
+// switches apps or locks the phone.
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && !video.paused) {
+    video.pause();
+  }
 });
