@@ -21,8 +21,11 @@ const voiceFiles = [
   "给johnbi7.m4a"
 ];
 
+const AUDIO_VERSION = "12";
 const VOICE_VOLUME = 1;
-const MUSIC_VOLUME = 0.02;
+// The music file is pre-attenuated so the mix also works on iPhone Safari,
+// where setting HTMLMediaElement.volume from JavaScript is not reliable.
+const MUSIC_VOLUME = 1;
 
 let currentVoiceIndex = 0;
 let sequenceState = "idle";
@@ -38,7 +41,7 @@ function applyVolumes() {
 }
 
 function voiceUrl(index) {
-  return new URL(voiceFiles[index], document.baseURI).href;
+  return new URL(`${voiceFiles[index]}?v=${AUDIO_VERSION}`, document.baseURI).href;
 }
 
 function loadVoice(index) {
