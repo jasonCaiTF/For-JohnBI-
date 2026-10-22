@@ -15,8 +15,13 @@
       <div class="opening-heart">♡</div>
       <h1>For My Johnbi</h1>
       <p>There are some things<br>I wanted you to hear.</p>
-      <button id="openButton" type="button"
-        onclick="document.getElementById('openingScreen').classList.add('hidden')">
+      <button 
+        id="openButton" type="button"
+        onclick="
+        var screen = document.getElementById('openingScreen');
+        screen.style.display = 'none';
+        "
+      >
         Open ♡
       </button>
     </div>
