@@ -1,221 +1,208 @@
 
-:root {
-  --cream: #fff8f2;
-  --white: #fffdfb;
-  --peach: #e8b49d;
-  --deep-peach: #c98268;
-  --soft-peach: #f5ddd1;
-  --text: #594c45;
-  --muted: #88766c;
-}
-
 * {
   box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  background: var(--cream);
-  color: var(--text);
+  background: #FFF8F2;
+  color: #594C45;
   font-family: Georgia, "Times New Roman", serif;
   line-height: 1.85;
-  overflow-x: hidden;
 }
 
-/* OPENING SCREEN */
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Opening screen */
 
 .opening-screen {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 1000;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   padding: 20px;
   background: radial-gradient(
     circle,
-    #fffdfb 0%,
-    #fff8f2 55%,
-    #f5ddd1 100%
+    #FFFDF9 0%,
+    #FFF8F2 55%,
+    #F5DDD1 100%
   );
+  transition: opacity .6s, visibility .6s;
+}
+
+.opening-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .opening-card {
   width: 100%;
-  max-width: 450px;
+  max-width: 460px;
   padding: 55px 25px;
   text-align: center;
-  background: rgba(255,255,255,.88);
-  border: 1px solid rgba(232,180,157,.25);
-  border-radius: 28px;
-  box-shadow: 0 20px 60px rgba(130,80,60,.12);
+  background: rgba(255,255,255,.9);
+  border-radius: 26px;
+  box-shadow: 0 20px 55px rgba(150,90,65,.12);
 }
 
 .opening-heart {
-  font-size: 48px;
-  color: var(--deep-peach);
-  margin-bottom: 12px;
+  font-size: 45px;
+  color: #C98268;
 }
 
 .opening-card h1 {
-  font-size: clamp(30px, 7vw, 44px);
-  font-weight: 500;
-  margin: 0 0 18px;
+  font-size: clamp(30px, 7vw, 43px);
+  font-weight: normal;
+  margin: 10px 0 20px;
 }
 
 .opening-card p {
+  color: #806F66;
   font-size: 16px;
-  color: var(--muted);
   margin-bottom: 30px;
 }
 
-#openButton {
-  appearance: none;
-  -webkit-appearance: none;
+#openButton,
+.start-button {
   border: none;
-  background: var(--peach);
+  border-radius: 30px;
+  background: #E8B49D;
   color: white;
-  border-radius: 50px;
-  padding: 15px 40px;
-  min-height: 48px;
-  font-family: inherit;
-  font-size: 17px;
-  cursor: pointer;
-  touch-action: manipulation;
+  padding: 13px 30px;
+  font-size: 16px;
   transition: background .2s, transform .2s;
 }
 
-#openButton:active {
-  transform: scale(.96);
+#openButton:hover,
+.start-button:hover {
+  background: #C98268;
+  transform: translateY(-2px);
 }
 
-#openButton:hover {
-  background: var(--deep-peach);
+/* Main layout */
+
+.main-content {
+  width: 88%;
+  max-width: 760px;
+  margin: auto;
+  padding: 55px 0 90px;
 }
 
-/* MAIN PAGE */
-
-.container {
-  width: min(90%, 760px);
-  margin: 0 auto;
-  padding: 60px 0 90px;
-}
-
-.page-header {
+.main-title {
   text-align: center;
-  margin-bottom: 55px;
-}
-
-.small-heart {
-  font-size: 24px;
-  color: var(--peach);
-  margin-bottom: 10px;
-}
-
-.page-header h1 {
   font-size: clamp(30px, 7vw, 46px);
-  font-weight: 500;
-  line-height: 1.35;
-  color: var(--deep-peach);
-  margin: 0;
+  font-weight: normal;
+  color: #C98268;
+  margin: 0 0 45px;
 }
 
-/* INTRO */
+/* Intro */
 
-.intro-section {
-  text-align: center;
+.intro-text {
   max-width: 650px;
   margin: 0 auto 35px;
+  text-align: center;
 }
 
-.intro-heading {
-  font-size: 20px;
-  font-weight: bold;
-  line-height: 1.65;
-  margin-bottom: 16px;
-}
-
-.intro-description {
+.intro-text p {
+  color: #76665E;
   font-size: 17px;
-  color: var(--muted);
-  line-height: 1.8;
+  margin: 0 0 15px;
 }
 
-/* VIDEO */
+.intro-text .intro-bold {
+  font-weight: bold;
+  color: #594C45;
+  font-size: 19px;
+}
+
+/* Video */
 
 .video-section {
   margin-bottom: 65px;
+  text-align: center;
 }
 
-.video-frame {
+.video-wrapper {
   width: 100%;
   overflow: hidden;
-  background: #161616;
-  border-radius: 20px;
-  box-shadow: 0 16px 40px rgba(130,80,60,.16);
+  border-radius: 18px;
+  background: #222;
+  box-shadow: 0 15px 40px rgba(120,80,60,.15);
 }
 
-.video-frame video {
+.video-wrapper video {
   display: block;
   width: 100%;
+  height: auto;
   max-height: 75vh;
-  object-fit: contain;
 }
 
-.video-caption {
-  text-align: center;
-  color: var(--muted);
+.start-button {
+  margin-top: 22px;
+}
+
+.video-hint {
+  color: #A58F84;
   font-size: 14px;
   font-style: italic;
-  margin: 16px 0 4px;
+  margin-top: 14px;
 }
 
 .audio-status {
-  text-align: center;
-  font-size: 13px;
-  color: var(--deep-peach);
-  min-height: 22px;
-  margin: 0;
+  color: #A15B49;
+  font-size: 14px;
+  min-height: 1.5em;
+  margin-top: 10px;
 }
 
-/* LETTER */
+/* Letter */
 
-.letter-section {
-  margin-top: 45px;
-}
-
-.section-heart {
+.divider {
   text-align: center;
-  color: var(--peach);
   font-size: 27px;
-  margin-bottom: 38px;
+  color: #D69A82;
+  margin-bottom: 35px;
 }
 
 .letter {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 40px 32px;
   font-size: 17px;
-  line-height: 1.95;
+  line-height: 2;
+  box-shadow: 0 10px 35px rgba(120,80,60,.08);
 }
 
 .letter p {
-  margin: 0 0 28px;
+  margin: 0 0 27px;
+}
+
+.letter p:last-child {
+  margin-bottom: 0;
 }
 
 .signature {
   text-align: right;
   font-style: italic;
-  color: var(--deep-peach);
-  margin-top: 35px !important;
+  color: #806F66;
 }
 
-/* FINAL PHOTO */
+/* Photo */
 
 .photo-section {
-  margin-top: 75px;
+  margin-top: 70px;
   text-align: center;
 }
 
@@ -224,141 +211,67 @@ body {
   width: 100%;
   max-width: 600px;
   height: auto;
-  margin: 0 auto;
-  border-radius: 20px;
-  box-shadow: 0 16px 45px rgba(130,80,60,.16);
+  margin: auto;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(120,80,60,.15);
 }
 
-/* FINAL MESSAGE */
+/* Ending */
 
-.final-section {
-  padding: 90px 10px 40px;
+.final-message {
+  padding: 90px 10px 45px;
   text-align: center;
 }
 
-.final-section p {
-  color: var(--deep-peach);
+.final-message p {
   font-size: clamp(22px, 5vw, 31px);
   line-height: 1.65;
   font-style: italic;
-  margin: 22px 0;
+  color: #C98268;
+  margin: 20px 0;
 }
 
-.ending-heart {
-  color: var(--peach);
-  font-size: 26px;
+.final-heart {
+  font-size: 32px;
+  line-height: 1.5;
 }
 
-/* MOBILE */
+/* Mobile */
 
 @media (max-width: 600px) {
-  .container {
-    width: 88%;
+  .main-content {
+    width: 90%;
     padding-top: 45px;
   }
 
-  .page-header {
-    margin-bottom: 40px;
+  .main-title {
+    margin-bottom: 35px;
   }
 
-  .intro-heading {
+  .intro-text p {
+    font-size: 16px;
+  }
+
+  .intro-text .intro-bold {
     font-size: 18px;
   }
 
-  .intro-description {
-    font-size: 16px;
-  }
-
-  .video-frame {
-    border-radius: 15px;
-  }
-
   .letter {
+    padding: 28px 21px;
     font-size: 16px;
-    line-height: 1.9;
+    line-height: 1.95;
   }
 
   .letter p {
     margin-bottom: 25px;
   }
 
+  .video-wrapper,
   .final-photo {
-    border-radius: 15px;
+    border-radius: 14px;
   }
 
-  .final-section {
+  .final-message {
     padding-top: 75px;
   }
-}
-html {
-    -webkit-text-size-adjust: 100%;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    background: #FFF8F2;
-    color: #594C45;
-    font-family: Georgia, "Times New Roman", serif;
-    line-height: 1.9;
-}
-
-.main-content {
-    width: 88%;
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 50px 0 90px;
-}
-
-.main-title {
-    text-align: center;
-    color: #C98268;
-    font-size: 32px;
-    margin-bottom: 40px;
-}
-
-.intro-text {
-    text-align: center;
-    margin-bottom: 35px;
-}
-
-.video-section {
-    margin: 30px auto 60px;
-}
-
-.video-wrapper video {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 16px;
-}
-
-.letter {
-    background: #FFFFFF;
-    padding: 35px 25px;
-    border-radius: 20px;
-    box-shadow: 0 10px 35px rgba(120,80,60,0.08);
-    font-size: 16px;
-    line-height: 2;
-}
-
-.letter p {
-    margin: 0 0 26px;
-}
-
-.photo-section {
-    margin-top: 65px;
-    text-align: center;
-}
-
-.final-photo {
-    width: 100%;
-    max-width: 600px;
-    border-radius: 18px;
-}
-
-.final-message {
-    padding: 75px 10px;
-    text-align: center;
-    color: #C98268;
 }
