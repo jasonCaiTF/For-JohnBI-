@@ -10,6 +10,8 @@ html {
 
 body {
   margin: 0;
+  min-width: 0;
+  overflow-x: hidden;
   background: #FFF8F2;
   color: #594C45;
   font-family: Georgia, "Times New Roman", serif;
@@ -19,6 +21,13 @@ body {
 button {
   font-family: inherit;
   cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+video:focus-visible {
+  outline: 3px solid rgba(201, 130, 104, .55);
+  outline-offset: 4px;
 }
 
 /* Opening screen */
@@ -28,6 +37,8 @@ button {
   inset: 0;
   z-index: 1000;
   display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
   align-items: center;
   justify-content: center;
   padding: 20px;
@@ -95,6 +106,7 @@ button {
 .main-content {
   width: 88%;
   max-width: 760px;
+  min-width: 0;
   margin: auto;
   padding: 55px 0 90px;
 }
@@ -147,6 +159,7 @@ button {
   width: 100%;
   height: auto;
   max-height: 75vh;
+  object-fit: contain;
 }
 
 .start-button {
@@ -183,6 +196,7 @@ button {
   font-size: 17px;
   line-height: 2;
   box-shadow: 0 10px 35px rgba(120,80,60,.08);
+  overflow-wrap: anywhere;
 }
 
 .letter p {
@@ -269,6 +283,11 @@ button {
   .video-wrapper,
   .final-photo {
     border-radius: 14px;
+  }
+
+  #openButton,
+  .start-button {
+    min-height: 46px;
   }
 
   .final-message {

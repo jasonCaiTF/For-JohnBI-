@@ -1,32 +1,15 @@
-
 "use strict";
 
-// =====================================
 // FOR MY JOHNBI ❤️
-// Video + 7 Recordings + Background Music
-// =====================================
+// Keep one video, one voice player, and one music player in sync.
 
-const openingScreen =
-  document.getElementById("openingScreen");
-
-const video =
-  document.getElementById("johnbiVideo");
-
-const voice =
-  document.getElementById("voiceAudio");
-
-const music =
-  document.getElementById("backgroundMusic");
-
-const startButton =
-  document.getElementById("startButton");
-
-const audioStatus =
-  document.getElementById("audioStatus");
-
-// =====================================
-// SEVEN RECORDINGS
-// =====================================
+const openingScreen = document.getElementById("openingScreen");
+const openButton = document.getElementById("openButton");
+const video = document.getElementById("johnbiVideo");
+const voice = document.getElementById("voiceAudio");
+const music = document.getElementById("backgroundMusic");
+const startButton = document.getElementById("startButton");
+const audioStatus = document.getElementById("audioStatus");
 
 const voiceFiles = [
   "给johnbi1.m4a",
@@ -38,61 +21,25 @@ const voiceFiles = [
   "给johnbi7.m4a"
 ];
 
+const VOICE_VOLUME = 1;
+const MUSIC_VOLUME = 0.02;
+
 let currentVoiceIndex = 0;
-let sequenceFinished = false;
-let sequenceStarted = false;
-let audioUnlocked = false;
-
-// Prevent old play requests from
-// interfering with a newer playback.
-let playGeneration = 0;
-
-// =====================================
-// AUDIO SETTINGS
-// =====================================
-
-// Repeat the 26-second video.
-video.loop = true;
-
-// Avoid overlapping original video sound.
-video.muted = true;
-
-// Recording volume.
-voice.volume = 1.0;
-
-// Background music: 7%.
-music.volume = 0.02;
-voice.volume = 1.0;
-music.loop = true;
-
-// =====================================
-// STATUS MESSAGE
-// =====================================
+let sequenceState = "idle";
+let playbackGeneration = 0;
 
 function showStatus(message) {
-  if (audioStatus) {
-    audioStatus.textContent = message;
-  }
+  audioStatus.textContent = message;
 }
 
-function clearStatus() {
-  showStatus("");
+function applyVolumes() {
+  voice.volume = VOICE_VOLUME;
+  music.volume = MUSIC_VOLUME;
 }
 
-// =====================================
-// OPENING SCREEN
-// =====================================
-
-const openButton =
-  document.getElementById("openButton");
-
-openButton.addEventListener("click", () => {
-  openingScreen.classList.add("hidden");
-});
-
-// =====================================
-// LOAD VOICE
-// =====================================
+function voiceUrl(index) {
+  return new URL(voiceFiles[index], document.baseURI).href;
+}
 
 function loadVoice(index) {
   if (index < 0 || index >= voiceFiles.length) {
@@ -100,286 +47,195 @@ function loadVoice(index) {
   }
 
   currentVoiceIndex = index;
-
-  voice.src = "./" + voiceFiles[index];
+  voice.src = voiceUrl(index);
   voice.load();
-
+  applyVolumes();
   return true;
 }
 
-// Load first recording.
-loadVoice(0);
-
-// =====================================
-// HANDLE PLAYBACK ERRORS
-// =====================================
-
-function handlePlayError(error, name, generation) {
-  if (generation !== playGeneration) {
+function reportPlayError(error, label, generation) {
+  if (generation !== playbackGeneration || error.name === "AbortError") {
     return;
   }
 
-  if (error.name === "AbortError") {
-    return;
-  }
-
-  console.error(name + " playback error:", error);
-
+  console.error(`${label} playback error:`, error);
   showStatus(
-    name + " could not start. " +
-    "Please check the file or tap " +
-    "Start our memories ♡ again."
+    `${label} could not start. Please tap Start our memories ♡ and try again.`
   );
 }
 
-// =====================================
-// START AUDIO
-// =====================================
+function playSafely(media, label, generation) {
+  const playRequest = media.play();
 
-function startAudio() {
-  if (sequenceFinished) {
-    return;
+  if (playRequest && typeof playRequest.catch === "function") {
+    playRequest.catch((error) => {
+      reportPlayError(error, label, generation);
+    });
+  }
+}
+
+function pauseSyncedAudio() {
+  playbackGeneration += 1;
+  voice.pause();
+  music.pause();
+
+  if (sequenceState === "playing") {
+    sequenceState = "paused";
+  }
+}
+
+function resetSequence() {
+  playbackGeneration += 1;
+  voice.pause();
+  music.pause();
+
+  sequenceState = "idle";
+  currentVoiceIndex = 0;
+  video.currentTime = 0;
+  music.currentTime = 0;
+  loadVoice(0);
+
+  startButton.textContent = "Start our memories ♡";
+  showStatus("");
+}
+
+function finishSequence() {
+  playbackGeneration += 1;
+  sequenceState = "finished";
+
+  voice.pause();
+  music.pause();
+  music.currentTime = 0;
+
+  if (!video.paused) {
+    video.pause();
   }
 
-  const generation = ++playGeneration;
+  startButton.textContent = "Listen again ♡";
+  showStatus("Seven little messages, just for you. ❤️");
+}
 
-  // Call both play() methods immediately.
-  // This helps mobile browser compatibility.
-
-  if (!voice.ended) {
-    const voicePromise = voice.play();
-
-    if (voicePromise) {
-      voicePromise.catch(error => {
-        handlePlayError(
-          error,
-          "Voice recording",
-          generation
-        );
-      });
-    }
+function startOrResumeAudio() {
+  if (sequenceState === "finished") {
+    resetSequence();
   }
 
-  const musicPromise = music.play();
+  if (!voice.src) {
+    loadVoice(currentVoiceIndex);
+  }
 
-  if (musicPromise) {
-    musicPromise.catch(error => {
-      handlePlayError(
-        error,
-        "Background music",
-        generation
+  sequenceState = "playing";
+  applyVolumes();
+
+  const generation = ++playbackGeneration;
+  playSafely(voice, "Voice recording", generation);
+  playSafely(music, "Background music", generation);
+}
+
+function startExperience() {
+  showStatus("");
+  startOrResumeAudio();
+
+  const generation = playbackGeneration;
+  const videoRequest = video.play();
+
+  if (videoRequest && typeof videoRequest.catch === "function") {
+    videoRequest.catch((error) => {
+      if (generation !== playbackGeneration || error.name === "AbortError") {
+        return;
+      }
+
+      console.error("Video playback error:", error);
+      pauseSyncedAudio();
+      showStatus(
+        "Video could not start. Check johnbi-video.mp4, then tap Start our memories ♡ again."
       );
     });
   }
 }
 
-// =====================================
-// START BUTTON
-// =====================================
+openButton.addEventListener("click", () => {
+  openingScreen.classList.add("hidden");
+  openingScreen.setAttribute("aria-hidden", "true");
 
-startButton.addEventListener("click", () => {
-  clearStatus();
-
-  // Restart everything if all
-  // seven recordings have finished.
-  if (sequenceFinished) {
-    resetSequence();
-  }
-
-  // This click is a direct user gesture.
-  // Start all media without waiting for
-  // another asynchronous operation.
-
-  audioUnlocked = true;
-  sequenceStarted = true;
-
-  startAudio();
-
-  const videoPromise = video.play();
-
-  if (videoPromise) {
-    videoPromise.catch(error => {
-      console.error("Video error:", error);
-
-      voice.pause();
-      music.pause();
-
-      showStatus(
-        "Video could not start. " +
-        "Please check johnbi-video.mp4."
-      );
-    });
-  }
+  window.setTimeout(() => {
+    openingScreen.hidden = true;
+  }, 650);
 });
 
-// =====================================
-// NATIVE VIDEO PLAY BUTTON
-// =====================================
+startButton.addEventListener("click", startExperience);
 
 video.addEventListener("play", () => {
-  clearStatus();
+  showStatus("");
 
-  if (sequenceFinished) {
-    resetSequence();
-  }
-
-  if (!sequenceStarted) {
-    sequenceStarted = true;
-  }
-
-  // If audio was already started by
-  // the custom button, don't duplicate it.
-  if (!audioUnlocked) {
-    audioUnlocked = true;
-  }
-
-  if (voice.paused || music.paused) {
-    startAudio();
+  if (
+    sequenceState !== "playing" ||
+    voice.paused ||
+    music.paused
+  ) {
+    startOrResumeAudio();
   }
 });
-
-// =====================================
-// PAUSE EVERYTHING
-// =====================================
 
 video.addEventListener("pause", () => {
-  voice.pause();
-  music.pause();
+  if (sequenceState !== "finished") {
+    pauseSyncedAudio();
+  }
 });
 
-// =====================================
-// PLAY NEXT RECORDING
-// =====================================
-
 voice.addEventListener("ended", () => {
+  if (sequenceState !== "playing") {
+    return;
+  }
 
-  // Last recording has finished.
-  if (
-    currentVoiceIndex ===
-    voiceFiles.length - 1
-  ) {
+  if (currentVoiceIndex === voiceFiles.length - 1) {
     finishSequence();
     return;
   }
 
-  // Next recording.
   const nextIndex = currentVoiceIndex + 1;
-
   loadVoice(nextIndex);
 
-  // Continue automatically if
-  // video is still playing.
-  if (!video.paused && !sequenceFinished) {
-
-    const generation = ++playGeneration;
-
-    voice.play().catch(error => {
-      handlePlayError(
-        error,
-        "Voice recording " + (nextIndex + 1),
-        generation
-      );
-    });
-  }
+  const generation = ++playbackGeneration;
+  playSafely(voice, `Voice recording ${nextIndex + 1}`, generation);
 });
-
-// =====================================
-// FINISH ALL SEVEN RECORDINGS
-// =====================================
-
-function finishSequence() {
-  sequenceFinished = true;
-
-  voice.pause();
-  music.pause();
-  video.pause();
-
-  showStatus(
-    "Seven little messages, just for you. ❤️"
-  );
-
-  // Update button for replay.
-  startButton.textContent =
-    "Listen again ♡";
-}
-
-// =====================================
-// RESET FOR REPLAY
-// =====================================
-
-function resetSequence() {
-  playGeneration++;
-
-  voice.pause();
-  music.pause();
-  video.pause();
-
-  sequenceFinished = false;
-  sequenceStarted = false;
-
-  video.currentTime = 0;
-  music.currentTime = 0;
-
-  loadVoice(0);
-
-  startButton.textContent =
-    "Start our memories ♡";
-
-  clearStatus();
-}
-
-// =====================================
-// VIDEO ERROR
-// =====================================
 
 video.addEventListener("error", () => {
+  pauseSyncedAudio();
   showStatus(
-    "Video could not load. " +
-    "Check johnbi-video.mp4."
+    "Video could not load. Please check that johnbi-video.mp4 was uploaded completely."
   );
 });
-
-// =====================================
-// VOICE ERROR
-// =====================================
 
 voice.addEventListener("error", () => {
-  if (!voice.src) return;
+  if (!voice.src) {
+    return;
+  }
 
-  showStatus(
-    "Cannot load recording: " +
-    voiceFiles[currentVoiceIndex]
-  );
+  pauseSyncedAudio();
+  if (!video.paused) {
+    video.pause();
+  }
+  showStatus(`Cannot load recording: ${voiceFiles[currentVoiceIndex]}`);
 });
-
-// =====================================
-// MUSIC ERROR
-// =====================================
 
 music.addEventListener("error", () => {
+  music.pause();
   showStatus(
-    "Cannot load background-music.mp3."
+    "Background music could not load. The voice recording will continue without it."
   );
 });
 
-// =====================================
-// PAGE VISIBILITY
-// =====================================
-
-// Pause when the phone is locked
-// or the browser is moved to background.
-
-document.addEventListener(
-  "visibilitychange",
-  () => {
-    if (document.hidden && !video.paused) {
-      video.pause();
-    }
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && !video.paused) {
+    video.pause();
   }
-);
+});
 
-// =====================================
-// READY
-// =====================================
+video.loop = true;
+video.muted = true;
+music.loop = true;
+applyVolumes();
+loadVoice(0);
 
 console.log("For My Johnbi ❤️ Ready");

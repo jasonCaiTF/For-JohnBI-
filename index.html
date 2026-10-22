@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>For My Johnbi ❤️</title>
-  <link rel="stylesheet" href="./style.css?v=8">
+  <link rel="stylesheet" href="./style.css?v=9">
 </head>
 <body>
 
@@ -15,13 +15,7 @@
       <div class="opening-heart">♡</div>
       <h1>For My Johnbi</h1>
       <p>There are some things<br>I wanted you to hear.</p>
-      <button 
-        id="openButton" type="button"
-        onclick="
-        var screen = document.getElementById('openingScreen');
-        screen.style.display = 'none';
-        "
-      >
+      <button id="openButton" type="button" aria-controls="openingScreen">
         Open ♡
       </button>
     </div>
@@ -45,23 +39,24 @@
     <!-- Video -->
     <section class="video-section">
       <div class="video-wrapper">
-    <video
-        id="myVideo"
-        controls
-        playsinline
-        preload="metadata"
-        style="width:100%; display:block;"
-    >
-        <source src="./johnbi-video.mp4" type="video/mp4">
-        Your browser does not support this video.
-    </video>
-</div>
+        <video
+          id="johnbiVideo"
+          controls
+          playsinline
+          muted
+          preload="metadata"
+          aria-describedby="videoHint audioStatus"
+        >
+          <source src="./johnbi-video.mp4" type="video/mp4">
+          Your browser does not support this video.
+        </video>
+      </div>
 
       <button id="startButton" class="start-button" type="button">
         Start our memories ♡
       </button>
 
-      <p class="video-hint">
+      <p id="videoHint" class="video-hint">
         Tap to listen to my seven little messages.
       </p>
       <p id="audioStatus" class="audio-status"
@@ -69,8 +64,8 @@
     </section>
 
     <!-- Hidden audio players -->
-    <audio id="voiceAudio" preload="auto"></audio>
-    <audio id="backgroundMusic" preload="auto" loop>
+    <audio id="voiceAudio" preload="auto" aria-hidden="true"></audio>
+    <audio id="backgroundMusic" preload="auto" loop aria-hidden="true">
       <source src="./background-music.mp3" type="audio/mpeg">
     </audio>
 
@@ -185,7 +180,10 @@
       <img src="./johnbi.jpg"
         alt="A memory of Johnbi"
         class="final-photo"
-        loading="lazy">
+        width="4032"
+        height="2268"
+        loading="lazy"
+        decoding="async">
     </section>
 
     <!-- Final message -->
@@ -200,6 +198,6 @@
 
   </main>
 
-  <script src="./script.js?v=8" defer></script>
+  <script src="./script.js?v=9" defer></script>
 </body>
 </html>
