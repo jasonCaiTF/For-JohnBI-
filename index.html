@@ -4,118 +4,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>For My Johnbi ♡</title>
-
-  <link rel="stylesheet" href="./style.css">
+  <title>For My Johnbi ❤️</title>
+  <link rel="stylesheet" href="./style.css?v=8">
 </head>
-
 <body>
 
-  <!-- OPENING SCREEN -->
+  <!-- Opening screen -->
   <div id="openingScreen" class="opening-screen">
     <div class="opening-card">
-      <div class="heart">♡</div>
-
+      <div class="opening-heart">♡</div>
       <h1>For My Johnbi</h1>
-
-      <p>
-        There are some things<br>
-        I wanted you to hear.
-      </p>
-
-      <button
-        id="openButton"
-        type="button"
-        onclick="document.getElementById('openingScreen').classList.add('hidden')"
-      >
+      <p>There are some things<br>I wanted you to hear.</p>
+      <button id="openButton" type="button"
+        onclick="document.getElementById('openingScreen').classList.add('hidden')">
         Open ♡
       </button>
     </div>
   </div>
 
+  <main class="main-content">
 
-  <!-- MAIN CONTENT -->
-  <main id="mainContent" class="main-content">
+    <h1 class="main-title">For Johnbi~ 😊❤️</h1>
 
-    <h1 class="main-title">
-      For Johnbi~ 😊❤️
-    </h1>
-
-
-    <!-- INTRODUCTION -->
+    <!-- Text above video -->
     <section class="intro-text">
-
       <p class="intro-bold">
         Before you read my letter, I just want you to know something.
       </p>
-
       <p>
         Some things are difficult for me to say out loud,
         so I chose to leave them here instead.
       </p>
-
     </section>
 
-
-    <!-- VIDEO -->
+    <!-- Video -->
     <section class="video-section">
-
       <div class="video-wrapper">
-
-        <video
-          id="johnbiVideo"
+        <video id="johnbiVideo"
           controls
           playsinline
           preload="metadata"
-        >
-          <source
-            src="./johnbi-video.mp4"
-            type="video/mp4"
-          >
+          loop>
+          <source src="./johnbi-video.mp4" type="video/mp4">
           Your browser does not support this video.
         </video>
-
       </div>
 
+      <button id="startButton" class="start-button" type="button">
+        Start our memories ♡
+      </button>
+
       <p class="video-hint">
-        Tap play when you're ready. ♡
+        Tap to listen to my seven little messages.
       </p>
-
       <p id="audioStatus" class="audio-status"
-         role="status" aria-live="polite"></p>
-
+        role="status" aria-live="polite"></p>
     </section>
 
-
-    <!-- SEVEN VOICE RECORDINGS -->
-    <!-- Controlled by script.js -->
-    <audio
-      id="voiceAudio"
-      preload="auto"
-    ></audio>
-
-
-    <!-- BACKGROUND MUSIC -->
-    <audio
-      id="backgroundMusic"
-      preload="auto"
-      loop
-    >
-      <source
-        src="./background-music.mp3"
-        type="audio/mpeg"
-      >
+    <!-- Hidden audio players -->
+    <audio id="voiceAudio" preload="auto"></audio>
+    <audio id="backgroundMusic" preload="auto" loop>
+      <source src="./background-music.mp3" type="audio/mpeg">
     </audio>
 
-
-    <!-- LETTER -->
+    <!-- Letter -->
     <section class="letter-section">
-
       <div class="divider">♡</div>
 
-      <div class="letter">
-
+      <article class="letter">
         <p>Dear my Johnee,</p>
 
         <p>
@@ -213,47 +169,30 @@
           Someone who cares about u
         </p>
 
-        <p class="signature">
-          -Jason Cai
-        </p>
-
-      </div>
-
+        <p class="signature">-Jason Cai</p>
+      </article>
     </section>
 
-
-    <!-- FINAL PHOTO -->
+    <!-- Photo -->
     <section class="photo-section">
-
-      <img
-        src="./johnbi.jpg"
+      <img src="./johnbi.jpg"
         alt="A memory of Johnbi"
         class="final-photo"
-        loading="lazy"
-      >
-
+        loading="lazy">
     </section>
 
-
-    <!-- FINAL MESSAGE -->
+    <!-- Final message -->
     <section class="final-message">
-
       <div class="final-heart">❤️</div>
-
       <p>
         I believe that someday soon,<br>
         we'll definitely see each other again.
       </p>
-
       <div class="final-heart">❤️</div>
-
     </section>
 
   </main>
 
-
-  <!-- JAVASCRIPT -->
-  <script src="./script.js" defer></script>
-
+  <script src="./script.js?v=8" defer></script>
 </body>
 </html>
